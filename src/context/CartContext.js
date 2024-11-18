@@ -1,9 +1,28 @@
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 const CartContext = createContext();
 
+export const useCart = () => useContext(CartContext);
+
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
+
+  // Load cart from localStorage on initial load
+  useEffect(() => {
+    const storedCart = JSON.parse(localStorage.getItem("cart"));
+    if (storedCart) {
+      setCart(storedCart);
+    }
+  }, []);
+
+  // Save cart to localStorage whenever it changes
+  useEffect(() => {
+    if (cart.length > 0) {
+      localStorage.setItem("cart", JSON.stringify(cart));
+    } else {
+      localStorage.removeItem("cart"); // Clear the cart if it's empty
+    }
+  }, [cart]);
 
   const addToCart = product => {
     setCart(prev => {
@@ -44,5 +63,3 @@ export const CartProvider = ({ children }) => {
     </CartContext.Provider>
   );
 };
-
-export const useCart = () => useContext(CartContext);

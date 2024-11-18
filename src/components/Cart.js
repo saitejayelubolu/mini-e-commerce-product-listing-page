@@ -48,7 +48,7 @@ const Cart = () => {
   return (
     <>
       <ToggleButton isOpen={isOpen} onClick={() => setIsOpen(!isOpen)}>
-        {isOpen ? "Close Cart" : "Open Cart"}
+        {isOpen ? "X" : "Open Cart"}
       </ToggleButton>
       <CartWrapper isOpen={isOpen}>
         <h2>Cart</h2>

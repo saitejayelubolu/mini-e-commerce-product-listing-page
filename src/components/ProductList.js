@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import ProductCard from "./ProductCard";
+import Search from "./Search";
 
 const ProductGrid = styled.div`
   display: grid;
@@ -37,23 +38,37 @@ const PaginationWrapper = styled.div`
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 5;
 
   useEffect(() => {
     fetch("https://fakestoreapi.com/products")
       .then(res => res.json())
-      .then(data => setProducts(data));
+      .then(data => {
+        setProducts(data);
+        setFilteredProducts(data); // Set all products as the default filtered list
+      });
   }, []);
 
+  const handleSearch = searchTerm => {
+    if (searchTerm) {
+      const filtered = products.filter(product =>
+        product.title.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredProducts(filtered);
+    } else {
+      setFilteredProducts(products); // Reset to all products if search is cleared
+    }
+  };
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = products.slice(
+  const currentProducts = filteredProducts.slice(
     indexOfFirstProduct,
     indexOfLastProduct
   );
 
-  const totalPages = Math.ceil(products.length / productsPerPage);
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
   const handlePageChange = page => {
     setCurrentPage(page);
@@ -62,6 +77,7 @@ const ProductList = () => {
   return (
     <div>
       <h1>Product List</h1>
+      <Search onSearch={handleSearch} />
       <ProductGrid>
         {currentProducts.map(product => (
           <ProductCard key={product.id} product={product} />
